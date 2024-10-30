@@ -6,24 +6,23 @@
     <strong>A text-guided diffusion model for crystal structure generation
     </strong>
   </p>
-  <div style="display: flex; justify-content:center; align-items: center;">
+  <div style="display: flex; justify-content: center; align-items: center;">
     <img src="./assets/logo_static.jpg" height="200" alt="Chemeleon logo">
-    <img src="./assets/trajectory.gif" height="200" alt="Trajectory gif">
+    <img src="./assets/trajectory.gif" height="200" width="154" alt="Trajectory gif">
   </div>
-</div>
 
 <p align="center">
  <a href="https://8501-01j80snre5xdhq828s1q5brs0m.cloudspaces.litng.ai/">
      <img alt="App" src="https://img.shields.io/badge/app-v0.1.1-brightgreen.svg?style=plastic">
  </a>
   <a href="https://pypi.org/project/chemeleon">
-     <img alt="PypI" src="https://img.shields.io/badge/PyPI-v0.1.1-blue.svg?style=plastic&logo=PyPI">
+     <img alt="PyPI" src="https://img.shields.io/badge/PyPI-v0.1.1-blue.svg?style=plastic&logo=PyPI">
  </a>
  <a href="TODO: update">
      <img alt="DOI" src="https://img.shields.io/badge/DOI-doi-organge.svg?style=plastic">
  </a>
  <a href="https://github.com/hspark1212/chemeleon/blob/main/LICENSE">
-     <img alt="Lincense" src="https://img.shields.io/badge/License-MIT-lightgrey.svg?style=plastic">
+     <img alt="License" src="https://img.shields.io/badge/License-MIT-lightgrey.svg?style=plastic">
  </a>
 </p>
 
