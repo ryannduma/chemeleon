@@ -1,7 +1,6 @@
 <div align="center">
 
 <h1> Chemeleon </h1>
-
   <p>
     <strong>A text-guided diffusion model for crystal structure generation
     </strong>
@@ -10,6 +9,7 @@
     <img src="./assets/logo_static.jpg" height="200" alt="Chemeleon logo">
     <img src="./assets/trajectory.gif" height="200" width="154" alt="Trajectory gif">
   </div>
+</div>
 
 <p align="center">
  <a href="https://8501-01j80snre5xdhq828s1q5brs0m.cloudspaces.litng.ai/">
@@ -26,26 +26,35 @@
  </a>
 </p>
 
-
 # Overview
+
 Chemeleon is a text-guided diffusion model designed for crystal structure generation. The tool allows users to explore and generate crystal structures either through natural language descriptions or by specifying target compositions and navigating chemical systems.
 
-## Key Features:
+## Key Features
 
 - `Text-Guided Generation`: Generate crystal structures from descriptive text inputs, enabling intuitive exploration of material properties.
 - `Composition-Based Generation`: Create structures with specific chemical compositions, aiding targeted material discovery.
 - `Chemical System Navigation`: Systematically explore complex chemical systems by specifying elements of interest.
 
-## Demo Application:
+## Demo Application
 
 A demo version of Chemeleon is available at [Chemeleon App](https://8501-01j80snre5xdhq828s1q5brs0m.cloudspaces.litng.ai).
 >[!NOTE]
 > The demo is currently in beta and hosted on Lightning Studio. The server will automatically shut down when not in use and may take approximately 2 minutes to restart.
 
 For local deployment, you can run the application on your machine with the following command:
+
 ```bash
 streamlit run app/steamlit_app.py
 ```
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Training](#training)
+- [Evaluation](#evaluation)
+- [License](#license)
 
 # Installation
 
@@ -53,26 +62,31 @@ streamlit run app/steamlit_app.py
 <summary> Step-by-step installation </summary>
 
 ## Prerequisites
+
 - Python: Version 3.10 or higher
+
 ```bash
 conda create -n chemeleon python=3.10
 conda activate chemeleon
 ```
 
 ## Step 1: Install Pytorch and Pytorch Lightning
+
 Install PyTorch and PyTorch Lightning based on your system configuration.
 
 Recommended versions:
+
 - PyTorch: 2.1.0
 - PyTorch Lightning: 2.1.0 (same as PyTorch version)
 
-### For CPU:
+### For CPU
+
 ```bash
 pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
 pip install pytorch-lightning==2.1.0
 ```
 
-### For CUDA (specify your version):
+### For CUDA (specify your version)
 
 Replace `[cu_version]` with your desired CUDA version, such as `cu117` for CUDA 11.7, `cu118` for CUDA 11.8, etc.
 
@@ -82,26 +96,31 @@ pip install pytorch-lightning==2.1.0
 ```
 
 ## Step 2: Install PyTorch Geometric and Dependencies
+
 Install PyTorch Geometric and its dependencies based on your system configuration.
 
-### For CPU:
+### For CPU
+
 ```bash
 pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.1.0+cpu.html
 pip install torch-geometric
 ```
 
-### For CUDA (specify your version):
+### For CUDA (specify your version)
+
 ```bash
 pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.1.0+[cu_version].html
 pip install torch-geometric
 ```
 
 ## Step 3: Install Other Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Step 4: Install Chemeleon from Source Code
+
 ```bash
 git clone
 cd chemeleon
@@ -140,6 +159,7 @@ visualizer.view(index=1)
 ```
 
 ## 1. Generate Crystal Structures Using Text Prompts using CLI
+
 Generate crystal structures from textual descriptions, enabling intuitive material design.
 
 >[!NOTE]
@@ -162,6 +182,7 @@ In this example, `Chemeleon` generates 3 (`--n-samples`) crystal structures base
 </details>
 
 >[!TIP]
+>
 >- Ensure your text prompt includes both the composition and the crystal symmetry for better results.
 >- `--n-atoms` parameter should be consistent with the stoichiometry of the composition provided.
 
@@ -171,12 +192,13 @@ Generate crystal structures based on specific chemical compositions, aiding in t
 
 >[!NOTE]
 >For the target composition, Chemeleon uses a composition-based model trained with textual descriptions of compositions in a strict format (e.g., Ti1 O2).
+
 ```bash
 chemeleon sample composition --target-composition "TiO2" --n-samples 100 --max-natoms 40 --max-factor 13 --save-dir results/TiO2
 ```
 
 In this example, `Chemeleon` generates structures for multiple stoichiometries of the target composition TiO2 (`--target-composition`), up to a maximum Z (multiplication) factor of 13 (`--max-factor`).
-This means it will generate structures for Ti1O2, Ti2O4, ..., Ti13O26, ensuring the total number of atoms does not exceed 40 atoms (`--max-natoms`). 
+This means it will generate structures for Ti1O2, Ti2O4, ..., Ti13O26, ensuring the total number of atoms does not exceed 40 atoms (`--max-natoms`).
 For each stoichiometry, 100 structures (`--n-samples`) are generated. Duplicate structures are removed using Pymatgen's `StructureMatcher`, and unique structures are saved in the results/TiO2 (`--save-dir`) directory.
 
 <details>
@@ -188,9 +210,11 @@ Options:
 - `--max-natoms`: Maximum number of atoms allowed in a structure (default: 40).
 - `--max-factor`: Maximum Z (multiplication) factor for the composition's stoichiometry (default: 13).
 - `--save-dir` or `-s`: Directory to save the generated structures (default: results/TiO2).
+
 </details>
 
 >[!TIP]
+>
 >- Chemeleon will generate structures for stoichiometries from the base composition up to the specified --max-factor.
 >- If you want to generate structures for a single stoichiometry, set --max-natoms to the maximum number of atoms in the stoichiometry and --max-factor to 1.
 >- After generation, duplicate structures are filtered out to retain only unique structures.
@@ -208,7 +232,6 @@ chemeleon navigate system --elements Zn,Ti,O --n-samples 100 --max-stoich 8 --ma
 
 In this example, `Chemeleon` explores chemical systems containing zinc (Zn), titanium (Ti), and oxygen (O) elements (`--elements`). It enumerates all possible compositions with up to 8 stoichiometric coefficient (`--max-stoich`), following the chemical filters provided by SMACT. Then, it generates 100 structures (`--n-samples`) for each composition, ensuring that the total number of atoms in each structure does not exceed 40 atoms (`--max-natoms`) and the Z factor is less than 8 (`--max-factor`). After generation, duplicate structures are filtered out to retain only unique structures using Pymatgen's StructureMatcher. The unique structures are saved in the results/navigate directory (`--save-dir`).
 
-
 <details>
 <summary> Options </summary>
 
@@ -218,9 +241,11 @@ In this example, `Chemeleon` explores chemical systems containing zinc (Zn), tit
 - `--max-natoms`: Maximum number of atoms allowed in a structure (default: 40).
 - `--max-factor`: Maximum Z (multiplication) factor for the composition's stoichiometry (default: 8).
 - `--save-dir` or `-s`: Directory to save the generated structures (default: results/navigate).
+
 </details>
 
 >[!TIP]
+>
 >- The specified elements are used to generate all possible compositions within the stoichiometric range up to --max-stoich.
 >- `smact_validity` function from SMACT is used to filter out invalid compositions.
 >- After generation, duplicate structures are filtered out to retain only unique structures.
@@ -259,7 +284,6 @@ Alternatively, the text encoder can be trained with different types of text inpu
 >[!NOTE]
 >The detailed configuration can be found at [`config.py`](https://github.com/hspark1212/chemeleon/blob/main/chemeleon/config.py).
 
-
 ## 2. Denoising Diffusion Model
 
 After training the text encoder, the next step is to train the denoising diffusion model. This model generates crystal structures conditioned on text embeddings derived from `Crystal CLIP`. Conditional sampling is implemented using a classifier-free guidance scheme.
@@ -273,7 +297,6 @@ Like the text encoder, the diffusion model can be trained with different text in
 - General text: `chemeleon_clip_prompt`
 - Composition-based text: `chemeleon_clip_composition`
 - Formatted text: `chemeleon_clip_composition_crystal_system`
-
 
 >[!NOTE]
 >The detailed configuration can be found at [`config.py`](https://github.com/hspark1212/chemeleon/blob/main/chemeleon/config.py).
@@ -301,7 +324,6 @@ This script will output the following metrics:
 >[!TIP]
 > The result of the evaluation for Chemeleon v0.1.1 can be found at [WandB](https://wandb.ai/hspark1212/Chemeleon_v0.1.1?workspace=user-hspark1212).
 
-
 # License
-This project is licensed under the MIT License. See the [LICENSE file](https://github.com/hspark1212/chemeleon/blob/main/LICENSE) for more details.
 
+This project is licensed under the MIT License. See the [LICENSE file](https://github.com/hspark1212/chemeleon/blob/main/LICENSE) for more details.
