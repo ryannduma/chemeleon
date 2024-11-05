@@ -278,11 +278,13 @@ def main(use_client=False):
         <div style="text-align: center; color: grey; margin-top: 50px;">
             <p style="font-size: 14px; margin: 0;">
                 Developed by 
-                <a href="https://hspark1212.github.io" target="_blank">Hyunsoo Park</a>, Imperial College London
+                <a href="https://hspark1212.github.io" target="_blank">Hyunsoo Park</a>, 
+                as a part of <a href="https://github.com/wmd-group" target="_blank">Materials Design Group</a> 
+                at Imperial College London
             </p>
             <p>
                 <a href="https://www.yourpaperlink.com" target="_blank">Research Paper</a> | 
-                <a href="https://github.com/hspark1212/chemeleon" target="_blank">Repository</a> | 
+                <a href="https://github.com/hspark1212/chemeleon" target="_blank">Repository</a>
             </p>
         </div>
         """,
