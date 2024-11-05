@@ -108,6 +108,14 @@ def visualize_trajectory(atoms_list):
 
 # Main application function
 def main(use_client=False):
+    # Initialize session state
+    if "structures" not in st.session_state:
+        st.session_state.structures = []
+    if "trajectory" not in st.session_state:
+        st.session_state.trajectory = []
+    if "progress_in_generating" not in st.session_state:
+        st.session_state["progress_in_generating"] = False
+
     # Sidebar for user inputs
     with st.sidebar:
         st.image("app/assets/logo_static.jpg", width=200)
@@ -139,16 +147,9 @@ def main(use_client=False):
             step=1,
             help="Determine how many structure samples to generate.",
         )
-        generate_button = st.button("Generate Structures 🚀")
-
-    # Initialize session state
-    if "structures" not in st.session_state:
-        st.session_state.structures = []
-    if "trajectory" not in st.session_state:
-        st.session_state.trajectory = []
 
     # Generate Structures when button is clicked
-    if generate_button:
+    if st.session_state["progress_in_generating"]:
         # Clear previous structures
         st.session_state.structures = []
         st.session_state.trajectory = []
@@ -191,8 +192,19 @@ def main(use_client=False):
         # Remove the loading animation
         image_placeholder.empty()
 
+        # Reset the progress state
+        st.session_state["progress_in_generating"] = False
+
         # Display success message
         st.sidebar.success("✨ Structures generated successfully!")
+
+    with st.sidebar:
+        if st.button(
+            "Generate Structures 🚀",
+            disabled=st.session_state["progress_in_generating"],
+        ):
+            st.session_state["progress_in_generating"] = True
+            st.rerun()
 
     # Check if structures are generated
     if st.session_state.structures:
@@ -220,7 +232,7 @@ def main(use_client=False):
                 write(buffer, atoms, format="cif")
                 buffer.seek(0)
                 st.download_button(
-                    label=f"Download CIF File",
+                    label="Download CIF File",
                     data=buffer,
                     file_name=f"{str(atoms.symbols)}.cif",
                     mime="chemical/cif",
@@ -263,13 +275,14 @@ def main(use_client=False):
     # Footer
     st.markdown(
         """
-        ---
         <div style="text-align: center; color: grey; margin-top: 50px;">
-            <p style="font-size: 14px; margin: 0;">WMD Group, Imperial College London</p>
+            <p style="font-size: 14px; margin: 0;">
+                Developed by 
+                <a href="https://hspark1212.github.io" target="_blank">Hyunsoo Park</a>, Imperial College London
+            </p>
             <p>
                 <a href="https://www.yourpaperlink.com" target="_blank">Research Paper</a> | 
-                <a href="https://github.com/your-repo" target="_blank">Repository</a> | 
-                <a href="https://www.yourwebsite.com" target="_blank">Group Website</a>
+                <a href="https://github.com/hspark1212/chemeleon" target="_blank">Repository</a> | 
             </p>
         </div>
         """,
