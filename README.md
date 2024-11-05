@@ -327,4 +327,4 @@ This script will output the following metrics:
 # License
 
 This project is licensed under the MIT License, developed by [Hyunsoo Park](https://hspark1212.github.io) as part of the [Materials Design Group](https://github.com/wmd-group) at Imperial College London.
-. See the [LICENSE file](https://github.com/hspark1212/chemeleon/blob/main/LICENSE) for more details.
+See the [LICENSE file](https://github.com/hspark1212/chemeleon/blob/main/LICENSE) for more details.
