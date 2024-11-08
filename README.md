@@ -18,7 +18,7 @@
   <a href="https://pypi.org/project/chemeleon">
      <img alt="PyPI" src="https://img.shields.io/badge/PyPI-v0.1.1-blue.svg?style=plastic&logo=PyPI">
  </a>
- <a href="TODO: update">
+ <a href="https://chemrxiv.org/engage/chemrxiv/article-details/6728e27cf9980725cf118177">
      <img alt="DOI" src="https://img.shields.io/badge/DOI-doi-organge.svg?style=plastic">
  </a>
  <a href="https://github.com/hspark1212/chemeleon/blob/main/LICENSE">
@@ -54,6 +54,7 @@ streamlit run app/steamlit_app.py
 - [Getting Started](#getting-started)
 - [Training](#training)
 - [Evaluation](#evaluation)
+- [Citation](#citation)
 - [License](#license)
 
 # Installation
@@ -323,6 +324,21 @@ This script will output the following metrics:
 
 >[!TIP]
 > The result of the evaluation for Chemeleon v0.1.1 can be found at [WandB](https://wandb.ai/hspark1212/Chemeleon_v0.1.1?workspace=user-hspark1212).
+
+# Citation
+
+If you find our work helpful, please refer to the following publication:
+["Exploration of crystal chemical space using text-guided generative artificial intelligence" Chemxiv (2024)](https://chemrxiv.org/engage/chemrxiv/article-details/6728e27cf9980725cf118177)
+
+```
+@article{chemeleon,
+  title={Exploration of crystal chemical space using text-guided generative artificial intelligence},
+  author={Park, Hyunsoo and Onwuli, Anthony and Walsh, Aron},
+  journal={ChemRxiv},
+  doi={10.26434/chemrxiv-2024-rw8p5},
+  year={2024}
+}
+```
 
 # License
 

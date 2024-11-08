@@ -283,7 +283,7 @@ def main(use_client=False):
                 at Imperial College London
             </p>
             <p>
-                <a href="https://www.yourpaperlink.com" target="_blank">Research Paper</a> | 
+                <a href="https://chemrxiv.org/engage/chemrxiv/article-details/6728e27cf9980725cf118177" target="_blank">Research Paper</a> | 
                 <a href="https://github.com/hspark1212/chemeleon" target="_blank">Repository</a>
             </p>
         </div>
