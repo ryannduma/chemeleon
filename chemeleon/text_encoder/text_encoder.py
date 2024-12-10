@@ -15,7 +15,7 @@ from transformers import (
 
 from chemeleon.text_encoder import MODEL_NAMES, ARTIFACT_PATHS
 from chemeleon.text_encoder.crystal_clip import CrystalClip
-from chemeleon.modules.diff_utils import prob_mask_like
+from chemeleon.utils.diff_utils import prob_mask_like
 import wandb
 
 

@@ -59,77 +59,38 @@ streamlit run app/steamlit_app.py
 
 # Installation
 
-<details>
-<summary> Step-by-step installation </summary>
-
 ## Prerequisites
 
-- Python: Version 3.10 or higher
+- Python 3.10 or later
 
 ```bash
 conda create -n chemeleon python=3.10
 conda activate chemeleon
 ```
 
-## Step 1: Install Pytorch and Pytorch Lightning
+- Pytorch >= 1.12 (install from the [official website](https://pytorch.org/) suitable for your environment)
+  
+>[!NOTE]
+> It is recommended to install PyTorch prior to installing DAC-SIM to avoid potential issues with GPU support.
+> The training of chemeleon models was implemented using PyTorch 2.1.0.
 
-Install PyTorch and PyTorch Lightning based on your system configuration.
+`chemeleon` can be installed from PyPI or the source code.
 
-Recommended versions:
-
-- PyTorch: 2.1.0
-- PyTorch Lightning: 2.1.0 (same as PyTorch version)
-
-### For CPU
+## Install from PyPI
 
 ```bash
-pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
-pip install pytorch-lightning==2.1.0
+pip install chemeleon
 ```
 
-### For CUDA (specify your version)
-
-Replace `[cu_version]` with your desired CUDA version, such as `cu117` for CUDA 11.7, `cu118` for CUDA 11.8, etc.
+## Install from Source Code
 
 ```bash
-pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/[cu_version]
-pip install pytorch-lightning==2.1.0
-```
-
-## Step 2: Install PyTorch Geometric and Dependencies
-
-Install PyTorch Geometric and its dependencies based on your system configuration.
-
-### For CPU
-
-```bash
-pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.1.0+cpu.html
-pip install torch-geometric
-```
-
-### For CUDA (specify your version)
-
-```bash
-pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-2.1.0+[cu_version].html
-pip install torch-geometric
-```
-
-## Step 3: Install Other Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-## Step 4: Install Chemeleon from Source Code
-
-```bash
-git clone
+git clone https://github.com/hspark1212/chemeleon.git
 cd chemeleon
 pip install -e .
 ```
 
 To verify the installation, run the code in the [demo.ipynb](./demo.ipynb) notebook.
-</details>
 
 # Getting Started
 

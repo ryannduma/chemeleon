@@ -1,8 +1,6 @@
 torch>=2.1.0
 pytorch-lightning>=2.1.0
-numpy<2.0
 torch-geometric
-torch-scatter
 torchmetrics
 streamlit
 dash

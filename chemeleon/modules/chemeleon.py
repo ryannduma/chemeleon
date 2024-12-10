@@ -14,10 +14,10 @@ from chemeleon.constants import (
     PATH_CHEMELEON_COMPOSITION,
     CHECKPOINT_URLS,
 )
-from chemeleon.utils import download_file
+from chemeleon.utils.download import download_file
 from chemeleon.modules.base_module import BaseModule
 from chemeleon.modules.cspnet import CSPNet, SinusoidalTimeEmbeddings
-from chemeleon.modules.diff_utils import (
+from chemeleon.utils.diff_utils import (
     BetaScheduler,
     SigmaScheduler,
     d_log_p_wrapped_normal,

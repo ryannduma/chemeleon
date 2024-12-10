@@ -3,7 +3,8 @@ import numpy as np
 
 import torch
 from torch import Tensor
-from torch_scatter import segment_coo, segment_csr
+
+# from torch_scatter import segment_coo, segment_csr
 
 
 def repeat_blocks(

@@ -13,13 +13,14 @@ with open("README.md", "r") as f:
 
 setup(
     name="chemeleon",
-    version="0.1.1",
+    version="0.0.1",
     author="Hyunsoo Park",
     author_email="phs68660888@gmail.com",
     description="A Text-guided Crystal Structure Generation Model",
     long_description=long_description,
     packages=find_packages(),
     install_requires=install_requires,
+    include_package_data=True,
     entry_points={
         "console_scripts": [
             "chemeleon=chemeleon.cli:cli",

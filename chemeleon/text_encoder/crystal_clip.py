@@ -5,11 +5,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from torch_geometric.data import Batch
-from torch_scatter import scatter_mean, scatter_sum
 from transformers import BertModel, BertTokenizer
 
 from chemeleon.text_encoder import MODEL_NAMES
 from chemeleon.modules.cspnet import CSPNet
+from chemeleon.utils.scatter import scatter_mean, scatter_sum
 
 
 class CrystalClip(pl.LightningModule):

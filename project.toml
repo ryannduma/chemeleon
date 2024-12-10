@@ -1,2 +1,0 @@
-[project.scripts]
-chemeleon = "chemeleon.cli:cli"

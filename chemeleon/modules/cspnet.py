@@ -5,13 +5,13 @@ from collections import namedtuple
 import torch
 import torch.nn as nn
 
-from torch_scatter import scatter
 from torch_geometric.utils import dense_to_sparse
 
-from chemeleon.modules.data_utils import (
+from chemeleon.utils.data_utils import (
     radius_graph_pbc,
     repeat_blocks,
 )
+from chemeleon.utils.scatter import scatter_mean
 
 DECODER_OUTPUTS = namedtuple(
     "DECODER_OUTPUTS", ["atom_types_out", "lattice_out", "coords_out", "node_features"]
@@ -152,11 +152,10 @@ class CSPLayer(nn.Module):
         return edge_features
 
     def node_model(self, node_features, edge_features, edge_index):
-        agg = scatter(
+        agg = scatter_mean(
             edge_features,
             edge_index[0],
             dim=0,
-            reduce="mean",
             dim_size=node_features.shape[0],
         )
         agg = torch.cat([node_features, agg], dim=1)
@@ -388,7 +387,7 @@ class CSPNet(nn.Module):
 
         coord_out = self.coord_out(node_features)
 
-        graph_features = scatter(node_features, node2graph, dim=0, reduce="mean")
+        graph_features = scatter_mean(node_features, node2graph, dim=0)
         lattice_out = self.lattice_out(graph_features)
         lattice_out = lattice_out.view(-1, 3, 3)
         if self.ip:
