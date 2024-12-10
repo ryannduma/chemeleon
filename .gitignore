@@ -29,7 +29,6 @@ data/mp-20/
 *.json
 *qsub*
 *.log
-*.yaml
 *.cif
 *.ckpt
 *.zip
