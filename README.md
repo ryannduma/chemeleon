@@ -16,7 +16,7 @@
      <img alt="App" src="https://img.shields.io/badge/app-v0.1.1-brightgreen.svg?style=plastic">
  </a>
   <a href="https://pypi.org/project/chemeleon">
-     <img alt="PyPI" src="https://img.shields.io/badge/PyPI-v0.1.1-blue.svg?style=plastic&logo=PyPI">
+     <img alt="PyPI" src="https://img.shields.io/badge/PyPI-v0.1.2-blue.svg?style=plastic&logo=PyPI">
  </a>
  <a href="https://chemrxiv.org/engage/chemrxiv/article-details/6728e27cf9980725cf118177">
      <img alt="DOI" src="https://img.shields.io/badge/DOI-doi-organge.svg?style=plastic">
