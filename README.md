@@ -71,7 +71,7 @@ conda activate chemeleon
 - Pytorch >= 1.12 (install from the [official website](https://pytorch.org/) suitable for your environment)
   
 >[!NOTE]
-> It is recommended to install PyTorch prior to installing DAC-SIM to avoid potential issues with GPU support.
+> It is recommended to install PyTorch prior to installing `chemeelon` to avoid potential issues with GPU support.
 > The training of chemeleon models was implemented using PyTorch 2.1.0.
 
 `chemeleon` can be installed from PyPI or the source code.
