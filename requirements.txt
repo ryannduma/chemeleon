@@ -14,4 +14,4 @@ pydantic
 einops
 jupyterlab
 pymatgen
-git+https://github.com/WMD-group/SMACT.git
+smact

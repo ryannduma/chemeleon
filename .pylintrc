@@ -636,7 +636,9 @@ disable=
         # E0213, # no-self-argument
         W0221, # arguments-differ
         W0707, # raise-missing-from
+        W0718, # broad-exception-caught
         C0415, # import-outside-toplevel
+        W1203, # logging-fstring-interpolation
 	W1514, # unspecified-encoding
 	W0123, # eval-used
 	E1130, # invalid-unary-operand-type

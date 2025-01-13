@@ -7,7 +7,7 @@ ex = Experiment("chemeleon")
 @ex.config
 def config():
     # base
-    project_name = "Chemeleon_v0.1.1"  # project_name for wandb
+    project_name = "Chemeleon_v0.2.1"  # project_name for wandb
     exp_name = "chemeleon"
     group_name = "mp-40"
     seed = 0
@@ -120,6 +120,22 @@ def clip_composition_crystal_system():
     group_name = "crystal_clip"
 
     text_targets = ["composition", "crystal_system"]
+
+
+@ex.named_config
+def clip_composition_stability():
+    exp_name = "clip_composition_stability"
+    group_name = "crystal_clip"
+
+    text_targets = ["composition", "stability"]
+
+
+@ex.named_config
+def clip_composition_metallic():
+    exp_name = "clip_composition_metallic"
+    group_name = "crystal_clip"
+
+    text_targets = ["composition", "metallic"]
 
 
 @ex.named_config

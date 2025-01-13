@@ -28,7 +28,7 @@ class MPDataset(Dataset):
         self.split = split
         self.text_guide = text_guide
         self.text_targets = text_targets
-    
+
         path_data = Path(self.data_dir, f"{self.split}.csv")
         self.data = pd.read_csv(path_data)
 
@@ -55,12 +55,7 @@ class MPDataset(Dataset):
             if len(self.text_targets) == 1:
                 text = str(properties[0])
             else:
-                text = ", ".join(
-                    [
-                        f"{self.text_targets[i]}: {properties[i]}"
-                        for i in range(len(properties))
-                    ]
-                )
+                text = ", ".join([f"{properties[i]}" for i in range(len(properties))])
             return atoms_to_pyg_data(atoms, text=text)
         else:
             return atoms_to_pyg_data(atoms)
