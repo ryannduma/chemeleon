@@ -7,7 +7,7 @@ ex = Experiment("chemeleon")
 @ex.config
 def config():
     # base
-    project_name = "Chemeleon_v0.1.1"  # project_name for wandb
+    project_name = "Chemeleon_v0.1.3"  # project_name for wandb
     exp_name = "chemeleon"
     group_name = "mp-40"
     seed = 0

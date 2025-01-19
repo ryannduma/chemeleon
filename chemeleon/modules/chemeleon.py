@@ -21,7 +21,10 @@ from chemeleon.utils.diff_utils import (
     BetaScheduler,
     SigmaScheduler,
     d_log_p_wrapped_normal,
+    make_noise_symmetric_preserve_variance,
     D3PM,
+    limit_mean_lattice,
+    limit_var_lattice,
 )
 from chemeleon.modules.schema import TrajectoryStep, TrajectoryContainer
 from chemeleon.text_encoder.text_encoder import TextEncoder
@@ -67,10 +70,7 @@ class Chemeleon(BaseModule):
             d3pm_hybrid_coeff=_config["d3pm_hybrid_coeff"],
         )
         # lattice noise
-        self.mask_lattice_matrix = (
-            torch.tensor([[1, 0, 1], [1, 1, 1], [0, 0, 1]]).bool().to(self.device)
-        )  # all lattice matrix are re-defined from a function "from_paramters" in pymatgen
-        # it will zero out three elements of the lattice matrix
+        self.make_noise_symmetric = make_noise_symmetric_preserve_variance
         # decoder
         self.decoder = CSPNet(
             hidden_dim=_config["hidden_dim"],
@@ -95,7 +95,7 @@ class Chemeleon(BaseModule):
         self.cost_coords = _config["cost_coords"]
 
     @classmethod
-    def load_general_text_model(cls, *args, **kwargs):
+    def load_general_text_model(cls, **kwargs):
         path_ckpt_chemeleon = PATH_CHEMELEON_GENERAL_TEXT
         path_ckpt_clip = PATH_CLIP_GENERAL_TEXT
 
@@ -115,7 +115,7 @@ class Chemeleon(BaseModule):
         )
 
     @classmethod
-    def load_composition_model(cls, *args, **kwargs):
+    def load_composition_model(cls, **kwargs):
         path_ckpt_chemeleon = PATH_CHEMELEON_COMPOSITION
         path_ckpt_clip = PATH_CLIP_COMPOSITION
 
@@ -148,14 +148,6 @@ class Chemeleon(BaseModule):
 
         time_emb = self.time_embed(batched_t)  # [B, time_dim]
 
-        alpha_cumprod = self.beta_scheduler.alphas_cumprod[batched_t]  # [B]
-
-        c0 = torch.sqrt(alpha_cumprod)  # [B]
-        c1 = torch.sqrt(1.0 - alpha_cumprod)  # [B]
-
-        sigmas = self.sigma_scheduler.sigmas[batched_t]  # [B]
-        sigmas_norm = self.sigma_scheduler.sigmas_norm[batched_t]  # [B]
-
         # q_sample (x_t | x_0)
         # 1) d3pm for atom types
         batch_idx = batch.batch
@@ -170,15 +162,31 @@ class Chemeleon(BaseModule):
 
         # 2) variance-preserving for lattice
         l_0 = batch.lattices
-        mask_lattice_matrix = self.mask_lattice_matrix.to(self.device)
-        noise_lattice = torch.randn_like(l_0) * mask_lattice_matrix  # [B, 3, 3]
-        x_t_lattice = c0[:, None, None] * l_0 + c1[:, None, None] * noise_lattice
+        alpha_cumprod = self.beta_scheduler.alphas_cumprod[batched_t][
+            :, None, None
+        ]  # [B, 1, 1]
+
+        noise_lattice = self.make_noise_symmetric(torch.randn_like(l_0))  # [B, 3, 3]
+        limit_mean_lattice_constant = (
+            1 - torch.sqrt(alpha_cumprod)
+        ) * limit_mean_lattice(batch.natoms)
+        limit_var_lattice_constant = limit_var_lattice(batch.natoms).sqrt()
+
+        # L_t = sqrt(α̅_t) * L_0 + (1 - sqrt(α̅_t)) * μ_limit + sqrt(1 - α̅_t) * ε * σ_limit
+        x_t_lattice = (
+            torch.sqrt(alpha_cumprod) * l_0
+            + limit_mean_lattice_constant
+            + torch.sqrt(1 - alpha_cumprod) * noise_lattice * limit_var_lattice_constant
+        )  # [B, 3, 3]
 
         # 3) variance-exploding for fractional coordinates
         frac_coords = batch.frac_coords
-        noise_coords = torch.randn_like(frac_coords)  # [B_n, 3]
+        sigmas = self.sigma_scheduler.sigmas[batched_t]  # [B]
+        sigmas_norm = self.sigma_scheduler.sigmas_norm[batched_t]  # [B]
         sigmas_per_atom = sigmas[batch_idx][:, None]  # [B_n, 1]
         sigmas_norm_per_atom = sigmas_norm[batch_idx][:, None]  # [B_n, 1]
+
+        noise_coords = torch.randn_like(frac_coords)  # [B_n, 3]
 
         target_coords = d_log_p_wrapped_normal(
             sigmas_per_atom * noise_coords, sigmas_per_atom
@@ -221,10 +229,7 @@ class Chemeleon(BaseModule):
         ce_loss = F.cross_entropy(pred_x_start_atom_types.flatten(0, -2), a_0.flatten())
         loss_atom_types = vb_loss + ce_loss * self.d3pm.hybrid_coeff
         # loss for lattice
-        loss_lattice = F.mse_loss(
-            pred_noise_lattice.masked_select(mask_lattice_matrix),
-            noise_lattice.masked_select(mask_lattice_matrix),
-        )
+        loss_lattice = F.mse_loss(pred_noise_lattice, noise_lattice)
         # loss for coords
         loss_coords = F.mse_loss(pred_noise_coords, target_coords)
 
@@ -237,8 +242,8 @@ class Chemeleon(BaseModule):
             "loss": loss,
             "vb_loss_atom_types": vb_loss,
             "ce_loss_atom_types": ce_loss,
-            "true_noise_lattice": noise_lattice.masked_select(mask_lattice_matrix),
-            "pred_noise_lattice": pred_noise_lattice.masked_select(mask_lattice_matrix),
+            "true_noise_lattice": noise_lattice,
+            "pred_noise_lattice": pred_noise_lattice,
             "true_noise_coords": target_coords,
             "pred_noise_coords": pred_noise_coords,
         }
@@ -341,14 +346,14 @@ class Chemeleon(BaseModule):
         num_nodes = batch.num_nodes
         batch_idx = batch.batch
         batch_natoms = batch.natoms
-        mask_lattice_matrix = self.mask_lattice_matrix.to(self.device)
 
         # sample from pure noise
-        a_T = torch.full((num_nodes,), 0, dtype=torch.long).to(self.device)
-        l_T = torch.randn(batch_size, 3, 3).to(self.device) * mask_lattice_matrix
-        x_T = torch.randn(num_nodes, 3).to(self.device)
-
         time_start = self.beta_scheduler.timesteps
+        a_T = torch.full((num_nodes,), 0, dtype=torch.long).to(self.device)
+        l_T = self.make_noise_symmetric(torch.randn(batch_size, 3, 3)).to(
+            self.device
+        ) + limit_mean_lattice(batch_natoms)
+        x_T = torch.randn(num_nodes, 3).to(self.device)
 
         trajectory_container = TrajectoryContainer(total_steps=time_start)
 
@@ -415,14 +420,19 @@ class Chemeleon(BaseModule):
             sigmas = self.beta_scheduler.sigmas[t]
             c0 = 1.0 / torch.sqrt(alphas)
             c1 = (1 - alphas) / torch.sqrt(1 - alphas_cumprod)
+
             rand_l = torch.randn_like(l_T) if t > 1 else torch.zeros_like(l_T)
-            rand_l = rand_l * mask_lattice_matrix
-            l_t_minus_1 = c0 * (l_t - c1 * pred_l) + sigmas * rand_l
-            l_t_minus_1 = l_t_minus_1 * mask_lattice_matrix
-            # clip the lattice matrix when t = T (for the first step of prediction)
-            # otherwise, the lattice matrix could be diverged when the first prediction is too large
-            if t == time_start:
-                l_t_minus_1 = l_t_minus_1.clip(-6, 6)
+            rand_l = self.make_noise_symmetric(rand_l)
+            limit_mean_lattice_constant = (
+                1 - torch.sqrt(alphas_cumprod)
+            ) * limit_mean_lattice(batch_natoms)
+            limit_var_lattice_constant = limit_var_lattice(batch_natoms).sqrt()
+
+            l_t_minus_1 = (
+                c0 * ((l_t - limit_mean_lattice_constant) - c1 * pred_l)
+                + sigmas * rand_l * limit_var_lattice_constant
+            ) + limit_mean_lattice(batch_natoms)
+
             # update the state for coords (0 -> 0.5 step)
             sigma_x = self.sigma_scheduler.sigmas[t]
             sigma_norm = self.sigma_scheduler.sigmas_norm[t]
@@ -468,9 +478,9 @@ class Chemeleon(BaseModule):
 
     def sample(
         self,
-        text_input: str,
         n_atoms: int,
         n_samples: int,
+        text_input: str = None,
         cond_scale: float = 2.0,
         step_lr: float = 1e-5,
         return_trajectory: bool = False,

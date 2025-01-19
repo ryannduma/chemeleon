@@ -13,7 +13,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="chemeleon",
-    version="0.1.2",
+    version="0.1.3",
     author="Hyunsoo Park",
     author_email="phs68660888@gmail.com",
     description="A Text-guided Crystal Structure Generation Model",

@@ -327,3 +327,64 @@ class D3PM(nn.Module):
             pred_q_posterior_logits + gumbel_noise * nonzero_mask, dim=-1
         )
         return sample
+
+
+def make_noise_symmetric_preserve_variance(noise: torch.Tensor) -> torch.Tensor:
+    """
+    https://github.com/microsoft/mattergen/blob/main/mattergen/common/diffusion/corruption.py
+    Makes the noise matrix symmetric, preserving the variance. Assumes i.i.d. noise for each dimension.
+
+    Args:
+        noise (torch.Tensor): Input noise matrix, must be a batched square matrix, i.e., have shape (batch_size, dim, dim).
+
+    Returns:
+        torch.Tensor: The symmetric noise matrix, with the same variance as the input.
+    """
+    assert (
+        len(noise.shape) == 3 and noise.shape[1] == noise.shape[2]
+    ), "Symmetric noise only works for square-matrix-shaped data."
+    # Var[1/sqrt(2) * (eps_i + eps_j)] = 0.5 Var[eps_i] + 0.5 Var[eps_j] = Var[noise]
+    # Special treatment of the diagonal elements, i.e., those we leave unchanged via masking.
+    return (1 / (2**0.5)) * (1 - torch.eye(3, device=noise.device)[None]) * (
+        noise + noise.transpose(1, 2)
+    ) + torch.eye(3, device=noise.device)[None] * noise
+
+
+def limit_mean_lattice(
+    n_atoms: torch.Tensor, atomic_density: float = 0.05771451654022283
+) -> torch.Tensor:
+    """
+    https://github.com/microsoft/mattergen/blob/main/mattergen/common/diffusion/corruption.py
+    Limit the mean number of atoms in a batch to a certain value for lattice diffusion.
+
+    Args:
+        n_atoms (torch.Tensor): Number of atoms in the batch.
+        atomic_density (float, optional): Atomic density (atoms/Angstrom^3).
+        Defaults to 0.05771451654022283.
+
+    Returns:
+        torch.Tensor: Factor to multiply the noise by to limit the mean
+    """
+    factor = (n_atoms / atomic_density).pow(1 / 3)
+    # Expand factor onto the diagonal of a 3x3 identity for each element in the batch
+    return factor[:, None, None] * torch.eye(3).to(factor.device)
+
+
+def limit_var_lattice(
+    n_atoms: torch.Tensor, limit_var_scaling_constant: float = 0.25
+) -> torch.Tensor:
+    """
+    https://github.com/microsoft/mattergen/blob/main/mattergen/common/diffusion/corruption.py
+    Limit the variance of the noise for lattice diffusion.
+
+    Args:
+        n_atoms (torch.Tensor): Number of atoms in the batch.
+        limit_var_scaling_constant (float, optional): Scaling constant for the variance limit.
+        Defaults to 0.25.
+
+    Returns:
+        torch.Tensor: Factor to multiply the noise by to limit the variance
+    """
+    factor = n_atoms.pow(2 / 3).mul(limit_var_scaling_constant)
+    # Broadcast factor across the 3x3 dimension
+    return factor[:, None, None].expand(-1, 3, 3)
