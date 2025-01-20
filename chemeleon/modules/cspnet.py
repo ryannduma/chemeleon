@@ -223,7 +223,7 @@ class CSPNet(nn.Module):
             )
         self.num_layers = num_layers
         self.coord_out = nn.Linear(hidden_dim, 3, bias=False)
-        self.lattice_out = nn.Linear(hidden_dim, 9, bias=False)
+        self.lattice_out = nn.Linear(hidden_dim, 6, bias=False)
         self.type_out = nn.Linear(hidden_dim, max_atoms)
         self.cutoff = cutoff
         self.max_neighbors = max_neighbors
@@ -388,8 +388,11 @@ class CSPNet(nn.Module):
         coord_out = self.coord_out(node_features)
 
         graph_features = scatter_mean(node_features, node2graph, dim=0)
-        lattice_out = self.lattice_out(graph_features)
-        lattice_out = lattice_out.view(-1, 3, 3)
+        lattice_out = self.lattice_out(graph_features)  # [B, 6]
+        symmetric_idx = torch.tensor([[0, 3, 4], [3, 1, 5], [4, 5, 2]]).to(
+            lattice_out.device
+        )
+        lattice_out = lattice_out[:, symmetric_idx]
         if self.ip:
             lattice_out = torch.einsum("bij,bjk->bik", lattice_out, lattices)
         if self.pred_atom_types:
