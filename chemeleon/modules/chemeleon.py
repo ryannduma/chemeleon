@@ -239,6 +239,7 @@ class Chemeleon(BaseModule):
             + self.cost_coords * loss_coords
         )
         return {
+            "batched_t": batched_t,
             "loss": loss,
             "vb_loss_atom_types": vb_loss,
             "ce_loss_atom_types": ce_loss,
@@ -431,7 +432,7 @@ class Chemeleon(BaseModule):
             l_t_minus_1 = (
                 c0 * ((l_t - limit_mean_lattice_constant) - c1 * pred_l)
                 + sigmas * rand_l * limit_var_lattice_constant
-            ) + limit_mean_lattice(batch_natoms)
+            ) + limit_mean_lattice_constant
 
             # update the state for coords (0 -> 0.5 step)
             sigma_x = self.sigma_scheduler.sigmas[t]
