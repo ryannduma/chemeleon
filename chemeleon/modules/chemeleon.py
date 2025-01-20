@@ -88,6 +88,7 @@ class Chemeleon(BaseModule):
             ip=_config["ip"],
             smooth=_config["smooth"],
             pred_atom_types=_config["pred_atom_types"],
+            symmetrize_lattice=_config["symmetrize_lattice"],
         )
         # set cost for loss
         self.cost_atom_types = _config["cost_atom_types"]

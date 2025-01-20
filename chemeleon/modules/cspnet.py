@@ -11,6 +11,7 @@ from chemeleon.utils.data_utils import (
     radius_graph_pbc,
     repeat_blocks,
 )
+from chemeleon.utils.diff_utils import make_noise_symmetric_preserve_variance
 from chemeleon.utils.scatter import scatter_mean
 
 DECODER_OUTPUTS = namedtuple(
@@ -199,6 +200,7 @@ class CSPNet(nn.Module):
         ip=True,
         smooth=True,
         pred_atom_types=True,
+        symmetrize_lattice=True,
     ):
         super(CSPNet, self).__init__()
 
@@ -223,7 +225,7 @@ class CSPNet(nn.Module):
             )
         self.num_layers = num_layers
         self.coord_out = nn.Linear(hidden_dim, 3, bias=False)
-        self.lattice_out = nn.Linear(hidden_dim, 6, bias=False)
+        self.lattice_out = nn.Linear(hidden_dim, 9, bias=False)
         self.type_out = nn.Linear(hidden_dim, max_atoms)
         self.cutoff = cutoff
         self.max_neighbors = max_neighbors
@@ -232,6 +234,7 @@ class CSPNet(nn.Module):
         if self.ln:
             self.final_layer_norm = nn.LayerNorm(hidden_dim)
         self.pred_atom_types = pred_atom_types
+        self.symmetrize_lattice = symmetrize_lattice
 
     def select_symmetric_edges(self, tensor, mask, reorder_idx, inverse_neg):
         # Mask out counter-edges
@@ -388,13 +391,12 @@ class CSPNet(nn.Module):
         coord_out = self.coord_out(node_features)
 
         graph_features = scatter_mean(node_features, node2graph, dim=0)
-        lattice_out = self.lattice_out(graph_features)  # [B, 6]
-        symmetric_idx = torch.tensor([[0, 3, 4], [3, 1, 5], [4, 5, 2]]).to(
-            lattice_out.device
-        )
-        lattice_out = lattice_out[:, symmetric_idx]
+        lattice_out = self.lattice_out(graph_features)
+        lattice_out = lattice_out.view(-1, 3, 3)
         if self.ip:
             lattice_out = torch.einsum("bij,bjk->bik", lattice_out, lattices)
+        if self.symmetrize_lattice:
+            lattice_out = make_noise_symmetric_preserve_variance(lattice_out)
         if self.pred_atom_types:
             type_out = self.type_out(node_features)
         else:

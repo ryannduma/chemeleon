@@ -40,6 +40,7 @@ def config():
     ip = True
     smooth = False
     pred_atom_types = True
+    symmetrize_lattice = True
 
     # chemeleon
     text_guide = True
