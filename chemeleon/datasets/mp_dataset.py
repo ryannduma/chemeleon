@@ -1,4 +1,6 @@
-from typing import List
+import re
+import ast
+import random
 from pathlib import Path
 import warnings
 import pandas as pd
@@ -21,7 +23,7 @@ class MPDataset(Dataset):
         data_dir: str,
         split: str,
         text_guide: bool = False,
-        text_targets: List[str] = None,
+        text_targets: list[str] = None,
     ):
         super().__init__()
         self.data_dir = Path(data_dir)
@@ -54,6 +56,9 @@ class MPDataset(Dataset):
             properties = data[self.text_targets].values
             if len(self.text_targets) == 1:
                 text = str(properties[0])
+                if re.match(r"\[.*\]", text):
+                    test_list = ast.literal_eval(text)
+                    text = random.choice(test_list)
             else:
                 text = ", ".join([f"{properties[i]}" for i in range(len(properties))])
             return atoms_to_pyg_data(atoms, text=text)
