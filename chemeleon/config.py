@@ -182,26 +182,6 @@ def chemeleon_clip_composition():
     text_encoder = "chemeleon/clip-mp-composition"
 
 
-@ex.named_config
-def chemeleon_t5_composition():
-    exp_name = "chemeleon_t5_composition"
-    group_name = "composition"
-
-    text_targets = ["composition"]
-    text_encoder = "t5-3b"
-    text_embed_dim = 1024
-
-
-@ex.named_config
-def chemeleon_llama_composition():
-    exp_name = "chemeleon_llama_composition"
-    group_name = "composition"
-
-    text_targets = ["composition"]
-    text_encoder = "meta-llama/Meta-Llama-3-8B-Instruct"
-    text_embed_dim = 4096
-
-
 ##########################
 ##### crystal_system #####
 ##########################
@@ -222,26 +202,6 @@ def chemeleon_clip_crystal_system():
 
     text_targets = ["crystal_system"]
     text_encoder = "chemeleon/clip-mp-crystalsystem"
-
-
-@ex.named_config
-def chemeleon_t5_crystal_system():
-    exp_name = "chemeleon_t5_crystal_system"
-    group_name = "crystal_system"
-
-    text_targets = ["crystal_system"]
-    text_encoder = "t5-3b"
-    text_embed_dim = 1024
-
-
-@ex.named_config
-def chemeleon_llama_crystal_system():
-    exp_name = "chemeleon_llama_crystal_system"
-    group_name = "crystal_system"
-
-    text_targets = ["crystal_system"]
-    text_encoder = "meta-llama/Meta-Llama-3-8B-Instruct"
-    text_embed_dim = 4096
 
 
 ########################################
@@ -266,26 +226,6 @@ def chemeleon_clip_composition_crystal_system():
     text_encoder = "chemeleon/clip-mp-composition_crystalsystem"
 
 
-@ex.named_config
-def chemeleon_t5_composition_crystal_system():
-    exp_name = "chemeleon_t5_composition_crystal_system"
-    group_name = "composition_crystal_system"
-
-    text_targets = ["composition", "crystal_system"]
-    text_encoder = "t5-3b"
-    text_embed_dim = 1024
-
-
-@ex.named_config
-def chemeleon_llama_composition_crystal_system():
-    exp_name = "chemeleon_llama_composition_crystal_system"
-    group_name = "composition_crystal_system"
-
-    text_targets = ["composition", "crystal_system"]
-    text_encoder = "meta-llama/Meta-Llama-3-8B-Instruct"
-    text_embed_dim = 4096
-
-
 ##################
 ##### prompt #####
 ##################
@@ -308,21 +248,23 @@ def chemeleon_clip_prompt():
     text_encoder = "chemeleon/clip-mp-prompt"
 
 
-@ex.named_config
-def chemeleon_t5_prompt():
-    exp_name = "chemeleon_t5_prompt"
-    group_name = "prompt"
-
-    text_targets = ["prompt"]
-    text_encoder = "t5-3b"
-    text_embed_dim = 1024
+###################################
+##### composition + stability #####
+###################################
 
 
 @ex.named_config
-def chemeleon_llama_prompt():
-    exp_name = "chemeleon_llama_prompt"
-    group_name = "prompt"
+def chemeleon_bert_composition_stability():
+    exp_name = "chemeleon_bert_composition_stability"
+    group_name = "composition_stability"
 
-    text_targets = ["prompt"]
-    text_encoder = "meta-llama/Meta-Llama-3-8B-Instruct"
-    text_embed_dim = 4096
+    text_targets = ["composition", "stability"]
+
+
+@ex.named_config
+def chemeleon_clip_composition_stability():
+    exp_name = "chemeleon_clip_composition_stability"
+    group_name = "composition_stability"
+
+    text_targets = ["composition", "stability"]
+    text_encoder = "chemeleon/clip-mp-composition_stablity"
