@@ -9,9 +9,11 @@ MODEL_NAMES = [
     "chemeleon/clip-mp-composition",
     "chemeleon/clip-mp-composition_crystalsystem",
     "chemeleon/clip-mp-prompt",
+    "chemeleon/clip-mp-composition_stablity",
 ]
 ARTIFACT_PATHS = {
     "chemeleon/clip-mp-composition": "hspark1212/Chemeleon_v0.1.1/model-hlfus38h:v1",
     "chemeleon/clip-mp-composition_crystalsystem": "hspark1212/Chemeleon_v0.1.1/model-b0xyc1sy:v1",
     "chemeleon/clip-mp-prompt": "hspark1212/Chemeleon_v0.1.1/model-upy53q4b:v1",
+    "chemeleon/clip-mp-composition_stablity": "",  # TODO
 }
