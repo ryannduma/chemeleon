@@ -176,8 +176,9 @@ class Chemeleon(BaseModule):
         # L_t = sqrt(α̅_t) * L_0 + (1 - sqrt(α̅_t)) * μ_limit + sqrt(1 - α̅_t) * ε * σ_limit
         x_t_lattice = (
             torch.sqrt(alpha_cumprod) * l_0
-            + limit_mean_lattice_constant
-            + torch.sqrt(1 - alpha_cumprod) * noise_lattice * limit_var_lattice_constant
+            # + limit_mean_lattice_constant # TODO: check this
+            + torch.sqrt(1 - alpha_cumprod)
+            * noise_lattice  # * limit_var_lattice_constant # TODO: check this
         )  # [B, 3, 3]
 
         # 3) variance-exploding for fractional coordinates
@@ -429,12 +430,13 @@ class Chemeleon(BaseModule):
                 1 - torch.sqrt(alphas_cumprod)
             ) * limit_mean_lattice(batch_natoms)
             limit_var_lattice_constant = limit_var_lattice(batch_natoms).sqrt()
-
+            l_t_minus_1 = c0 * (l_t - c1 * pred_l) + sigmas * rand_l
+            """
             l_t_minus_1 = (
                 c0 * ((l_t - limit_mean_lattice_constant) - c1 * pred_l)
                 + sigmas * rand_l * limit_var_lattice_constant
             ) + limit_mean_lattice_constant
-
+            """
             # update the state for coords (0 -> 0.5 step)
             sigma_x = self.sigma_scheduler.sigmas[t]
             sigma_norm = self.sigma_scheduler.sigmas_norm[t]
